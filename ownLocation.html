@@ -2,6 +2,8 @@
 <html>
   <head>
     <title>Geolocation</title>
+    <link rel="stylesheet" type="text/css" href="index-style.css" />
+
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
     <style>
@@ -25,8 +27,8 @@
 
       function initMap() {
         var map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: -34.397, lng: 150.644},
-          zoom: 6
+          center: {lat: 0, lng: 0},
+          zoom: 12
         });
         var infoWindow = new google.maps.InfoWindow({map: map});
 
@@ -58,7 +60,7 @@
       }
     </script>
     <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap">
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIWmrMuD_FvvSM0D61NVcOtGTTDDtgDzg&callback=initMap">
     </script>
   </body>
 </html>
