@@ -64,6 +64,19 @@
                               'Error: Your browser doesn\'t support geolocation.');
       }
     </script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script>
+    $.ajaxSetup({beforeSend: function(xhr){
+      if (xhr.overrideMimeType) {
+        xhr.overrideMimeType("application/json");
+      }
+    }
+    });
+
+    $.getJSON('yelp_academic_dataset_business.json', function(data) {
+      console.log('it works');
+    });
+    </script>
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIWmrMuD_FvvSM0D61NVcOtGTTDDtgDzg&callback=initMap&language=">
     </script>

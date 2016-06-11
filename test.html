@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script>
+    // $.ajaxSetup({beforeSend: function(xhr){
+    //   if (xhr.overrideMimeType) {
+    //     xhr.overrideMimeType("application/json");
+    //   }
+    // }
+    // });
+
+    $.getJSON('yelp_academic_dataset_business.json', {}, function(data) {
+      console.log("it works");
+    });
+    </script>
+</head>
+<body>
+
+</body>
+</html>
