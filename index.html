@@ -9,6 +9,7 @@
     <meta charset="utf-8">
     <style>
       html, body {
+        font-family: 'Open Sans';
         height: 100%;
         margin: 0;
         padding: 0;
@@ -25,21 +26,12 @@
     <div id="side-bar">
       <div id="title"> By the Way </div>
       <hr />
-      <input id="pac-input" class="controls" type="text"
+      <div id="search">
+        Directions to:
+        <input id="pac-input" class="controls" type="text"
               placeholder="Enter a location">
-          <div id="type-selector" class="controls">
-            <input type="radio" name="type" id="changetype-all" checked="checked">
-            <label for="changetype-all">All</label>
-
-            <input type="radio" name="type" id="changetype-establishment">
-            <label for="changetype-establishment">Establishments</label>
-
-            <input type="radio" name="type" id="changetype-address">
-            <label for="changetype-address">Addresses</label>
-
-            <input type="radio" name="type" id="changetype-geocode">
-            <label for="changetype-geocode">Geocodes</label>
-          </div>
+      </div>
+      <hr />
       <div id="filters">
         Filters:
       </div>
@@ -94,8 +86,6 @@
             document.getElementById('pac-input'));
 
           var types = document.getElementById('type-selector');
-          map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-          map.controls[google.maps.ControlPosition.TOP_LEFT].push(types);
 
           var autocomplete = new google.maps.places.Autocomplete(input);
           autocomplete.bindTo('bounds', map);
