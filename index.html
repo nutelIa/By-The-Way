@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>Simple Map</title>
-  <link rel="stylesheet" type="text/css" href="index-style.css" />
+    <link rel="stylesheet" type="text/css" href="index-style.css" />
     <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
     <style>
@@ -12,35 +12,17 @@
         padding: 0;
       }
       #map {
-        height: calc(100% - 100px);
-        /*height: 100%;*/
+        height: 100%;
+        width: calc(75%);
+        /*height: calc(100% - 100px);*/
+        left: 25%;
       }
     </style>
   </head>
   <body>
-  <div class="top-bar">
-    <nav>
-      <ul class="menu">
-        <li class="menu-item">
-          <div class="search-bar">
-            <form>
-              <input type="image" src="./assets/img/magnify-class.png" alt="Search" class="resize-glass">
-              <input type="text" size="40%" placeholder="search">
-            </form>
-          </div>
-        </li>
-        <li class="menu-item middle">
-          <div class="title">Craigslist</div>
-          <!-- <input type="image" src="./assets/img/globe.png" alt="Search" class="resize-globe">
-          <div class="location">yay area</div> -->
-        </li>
-        <li class="menu-item">
-          <a href="#"><div class="sign-in">Sign in</div></a>
-        </li>
-      </ul>
-    </nav>
-  </div>
-  <!-- <div id ="content-container"> -->
+    <div id="side-bar">
+
+    </div>
     <div id="map"></div>
     <script>
       var map;
@@ -53,6 +35,5 @@
     </script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIWmrMuD_FvvSM0D61NVcOtGTTDDtgDzg&callback=initMap"
   type="text/javascript"></script>
-  <!-- </div> -->
   </body>
 </html>
