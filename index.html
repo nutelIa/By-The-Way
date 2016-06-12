@@ -45,6 +45,7 @@
         // Global variables
         var userposition;
         var destination;
+        var listofplaces = [];
 
         function test() {
             console.log(obj[1].business_id);
@@ -187,17 +188,22 @@
                     if (status == google.maps.places.PlacesServiceStatus.OK) {
                       for (var i = 0; i < results.length; i++) {
                         var place = results[i];
-                        console.log(place.name);
-                        // If the request succeeds, draw the place location on
-                        // the map as a marker, and register an event to handle a
-                        // click on the marker.
-                        var marker = new google.maps.Marker({
-                          map: map,
-                          position: place.geometry.location,
-                          title: place.name
-                        });
-                        markerListener(marker, infoWindow);
+                        if (!listofplaces.includes(place)) {
+                          listofplaces.push(place);
+                          // If the request succeeds, draw the place location on
+                          // the map as a marker, and register an event to handle a
+                          // click on the marker.
+                          var marker = new google.maps.Marker({
+                            map: map,
+                            position: place.geometry.location,
+                            title: place.name
+                          });
+                          markerListener(marker, infoWindow);
+                        }
                       };
+                      listofplaces.sort(function(a, b){
+                        return b.rating - a.rating;
+                      })
                     }
                 });
             }
