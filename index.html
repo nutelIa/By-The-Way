@@ -47,7 +47,7 @@
         var destination;
 
         function test() {
-          console.log(obj[1].business_id);
+            console.log(obj[1].business_id);
         }
 
         function initMap() {
@@ -81,28 +81,28 @@
                   location: new google.maps.LatLng(userlat, userlng),
                   radius: '1000',
                   types: ['restaurant']
-          };
+                };
 
-          // Create the PlaceService and send the request.
-          // Handle the callback with an anonymous function.
-          var service = new google.maps.places.PlacesService(map);
-          service.nearbySearch(request, function(results, status) {
-            if (status == google.maps.places.PlacesServiceStatus.OK) {
-                for (var i = 0; i < results.length; i++) {
-                var place = results[i];
-                console.log(place.name);
-                // If the request succeeds, draw the place location on
-                // the map as a marker, and register an event to handle a
-                // click on the marker.
-                var marker = new google.maps.Marker({
-                    map: map,
-                    position: place.geometry.location,
-                    title: place.name
+                // Create the PlaceService and send the request.
+                // Handle the callback with an anonymous function.
+                var service = new google.maps.places.PlacesService(map);
+                service.nearbySearch(request, function(results, status) {
+                    if (status == google.maps.places.PlacesServiceStatus.OK) {
+                      for (var i = 0; i < results.length; i++) {
+                        var place = results[i];
+                        console.log(place.name);
+                        // If the request succeeds, draw the place location on
+                        // the map as a marker, and register an event to handle a
+                        // click on the marker.
+                        var marker = new google.maps.Marker({
+                          map: map,
+                          position: place.geometry.location,
+                          title: place.name
+                        });
+                        markerListener(marker, infoWindow);
+                      };
+                    }
                 });
-                markerListener(marker, infoWindow);
-              };
-              }
-          });
                 infoWindow.setPosition(pos);
                 infoWindow.setContent('Location found.');
                 map.setCenter(pos);
@@ -114,18 +114,19 @@
             // Browser doesn't support Geolocation
             handleLocationError(false, infoWindow, map.getCenter());
           }
-          
-
-          // Autocomplete location search
           var input = /** @type {!HTMLInputElement} */(document.getElementById('pac-input'));
+
           var types = document.getElementById('type-selector');
+
           var autocomplete = new google.maps.places.Autocomplete(input);
           autocomplete.bindTo('bounds', map);
+
           var infowindow = new google.maps.InfoWindow();
           var marker = new google.maps.Marker({
               map: map,
               anchorPoint: new google.maps.Point(0, -29)
           });
+
           autocomplete.addListener('place_changed', function() {
               infowindow.close();
               marker.setVisible(false);
@@ -159,16 +160,54 @@
               destination = address;
               infowindow.setContent('<div><strong>' + place.name + '</strong><br>' + address);
               infowindow.open(map, marker);
-              calculateAndDisplayRoute(directionsService, directionsDisplay);
+              calculateAndDisplayRoute(directionsService, directionsDisplay, infoWindow, map);
           });
-        google.maps.event.addDomListener(window, 'load', initMap);
+          google.maps.event.addDomListener(window, 'load', initMap);
+        }
+
+        function showSteps(directionResult, infoWindow, map) {
+            var myRoute = directionResult.routes[0].legs[0];
+            for (var i = 0; i < myRoute.steps.length; i++) {
+              var marker2 = new google.maps.Marker ({
+                map: map,
+                position: myRoute.steps[i].start_location
+              });
+
+              var currPos = marker2.position;
+              // console.log(currPos.lat());
+
+                // var currPos = myRoute.steps[i].start_location;
+                var request = {
+                  location: new google.maps.LatLng(currPos.lat(), currPos.lng()),
+                  radius: '1000',
+                  types: ['restaurant']
+                };
+                var service = new google.maps.places.PlacesService(map);
+                service.nearbySearch(request, function(results, status) {
+                    if (status == google.maps.places.PlacesServiceStatus.OK) {
+                      for (var i = 0; i < results.length; i++) {
+                        var place = results[i];
+                        console.log(place.name);
+                        // If the request succeeds, draw the place location on
+                        // the map as a marker, and register an event to handle a
+                        // click on the marker.
+                        var marker = new google.maps.Marker({
+                          map: map,
+                          position: place.geometry.location,
+                          title: place.name
+                        });
+                        markerListener(marker, infoWindow);
+                      };
+                    }
+                });
+            }
         }
 
         function markerListener(marker, infoWindow) {
-        google.maps.event.addListener(marker, 'click', function() {
-          infoWindow.setContent(marker.title);
-          infoWindow.open(map, this);
-          });
+            google.maps.event.addListener(marker, 'click', function() {
+                infoWindow.setContent(marker.title);
+                infoWindow.open(map, this);
+            });
         }
 
         function handleLocationError(browserHasGeolocation, infoWindow, pos) {
@@ -178,20 +217,21 @@
                               'Error: Your browser doesn\'t support geolocation.');
         }
 
-      function calculateAndDisplayRoute(directionsService, directionsDisplay) {
-        console.log(destination);
-          directionsService.route({
-            origin: this.userposition,
-            destination: this.destination,
-            travelMode: google.maps.TravelMode.DRIVING
-          }, function(response, status) {
-            if (status === google.maps.DirectionsStatus.OK) {
-              directionsDisplay.setDirections(response);
-            } else {
-              window.alert('Directions request failed due to ' + status);
-            }
-          });
-       }
+        function calculateAndDisplayRoute(directionsService, directionsDisplay, infoWindow, map) {
+          console.log(destination);
+            directionsService.route({
+              origin: this.userposition,
+              destination: this.destination,
+              travelMode: google.maps.TravelMode.DRIVING
+            }, function(response, status) {
+              if (status === google.maps.DirectionsStatus.OK) {
+                directionsDisplay.setDirections(response);
+                showSteps(response, infoWindow, map);
+              } else {
+                window.alert('Directions request failed due to ' + status);
+              }
+            });
+         }
 
     </script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIWmrMuD_FvvSM0D61NVcOtGTTDDtgDzg&libraries=places&callback=initMap">
