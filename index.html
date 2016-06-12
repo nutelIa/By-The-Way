@@ -78,12 +78,12 @@
                 userposition = pos;
 
                 var request = {
-            location: new google.maps.LatLng(userlat, userlng),
-            radius: '1000',
-            types: ['restaurant']
+                  location: new google.maps.LatLng(userlat, userlng),
+                  radius: '1000',
+                  types: ['restaurant']
           };
 
-            // Create the PlaceService and send the request.
+          // Create the PlaceService and send the request.
           // Handle the callback with an anonymous function.
           var service = new google.maps.places.PlacesService(map);
           service.nearbySearch(request, function(results, status) {
@@ -114,19 +114,18 @@
             // Browser doesn't support Geolocation
             handleLocationError(false, infoWindow, map.getCenter());
           }
-      var input = /** @type {!HTMLInputElement} */(document.getElementById('pac-input'));
+          
 
+          // Autocomplete location search
+          var input = /** @type {!HTMLInputElement} */(document.getElementById('pac-input'));
           var types = document.getElementById('type-selector');
-
           var autocomplete = new google.maps.places.Autocomplete(input);
           autocomplete.bindTo('bounds', map);
-
           var infowindow = new google.maps.InfoWindow();
           var marker = new google.maps.Marker({
               map: map,
               anchorPoint: new google.maps.Point(0, -29)
           });
-
           autocomplete.addListener('place_changed', function() {
               infowindow.close();
               marker.setVisible(false);
@@ -169,8 +168,8 @@
         google.maps.event.addListener(marker, 'click', function() {
           infoWindow.setContent(marker.title);
           infoWindow.open(map, this);
-        });
-    }
+          });
+        }
 
         function handleLocationError(browserHasGeolocation, infoWindow, pos) {
           infoWindow.setPosition(pos);
