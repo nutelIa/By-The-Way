@@ -34,15 +34,14 @@ $TOKEN_SECRET = '8TPFCM4arIUM5ONyN92AT4bTegs';
 $API_HOST = 'api.yelp.com';
 $DEFAULT_TERM = 'restaurants';
 // $DEFAULT_LOCATION = 'Modesto, CA';
-// $LATITUDE = 37.639097;
-// $LONGITUDE = -120.996878;
-$LL = "37.639097, -120.996878";
+$LATITUDE = 37.639097;
+$LONGITUDE = -120.996878;
+// $LL = "37.639097, -120.996878";
 $SEARCH_LIMIT = 10;
 $SEARCH_PATH = '/v2/search/';
 $BUSINESS_PATH = '/v2/business/';
 
-$term="";
-$ll="";
+
 /** 
  * Makes a request to the Yelp API and returns the response
  * 
@@ -108,12 +107,12 @@ function request($host, $path) {
  * @param    $location    The search location passed to the API 
  * @return   The JSON response from the request 
  */
-function search($term, $ll) {
+function search($term, $latitude, $longitude) {
     $url_params = array();
     
     $url_params['term'] = $term ?: $GLOBALS['DEFAULT_TERM'];
     // $url_params['location'] = $location?: $GLOBALS['DEFAULT_LOCATION'];
-    $url_params['ll'] = $ll ?: $GLOBALS['LL'];
+    $url_params['ll'] = sprintf($GLOBALS['LATITUDE'] . ", " . $GLOBALS['LONGITUDE']);
     // $url_params['latitude'] = $GLOBALS['LATITUDE'];
     $url_params['limit'] = $GLOBALS['SEARCH_LIMIT'];
     $search_path = $GLOBALS['SEARCH_PATH'] . "?" . http_build_query($url_params);
@@ -139,8 +138,8 @@ function get_business($business_id) {
  * @param    $term        The search term to query
  * @param    $location    The location of the business to query
  */
-function query_api($term, $location) {     
-    $response = json_decode(search($term, $location));
+function query_api($term, $latitude, $longitude) {     
+    $response = json_decode(search($term, $latitude, $longitude));
     // $business_id = $response->businesses[0]->id;
     // $business_id2 = $response->businesses[1] ->id;
     
@@ -153,7 +152,7 @@ function query_api($term, $location) {
     // $response = get_business($business_id);
     // $response2 = get_business($business_id2);
     
-    print sprintf("Result for business \"%s\" found:\n", $business_id);
+    // print sprintf("Result for business \"%s\" found:\n", $business_id);
     for ($times = 0; $times < 10; $times++) {
         $business_id = $response->businesses[$times]->id;
         $result = get_business($business_id);
@@ -169,17 +168,17 @@ function query_api($term, $location) {
  */
 $longopts  = array(
     "term::",
-    "ll::",
-    // "latitude::"
+    "latitude::",
+    "longitude::"
 );
     
 $options = getopt("", $longopts);
 
-// $term = $options['term'] ?: '';
-// $latitude = $options['ll'] ?: '';
-// $longitude = $options['longitude'] ?: '';
+$term = $options['term'] ?: '';
+$latitude = $options['latitude'] ?: '';
+$longitude = $options['longitude'] ?: '';
 
 
-query_api($term, $ll);
+query_api($term, $latitude, $longitude);
 
 ?>
