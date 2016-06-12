@@ -37,7 +37,7 @@ $DEFAULT_TERM = 'restaurants';
 // $LATITUDE = 37.639097;
 // $LONGITUDE = -120.996878;
 $LL = "37.639097, -120.996878";
-$SEARCH_LIMIT = 3;
+$SEARCH_LIMIT = 10;
 $SEARCH_PATH = '/v2/search/';
 $BUSINESS_PATH = '/v2/business/';
 
@@ -108,7 +108,7 @@ function request($host, $path) {
  * @param    $location    The search location passed to the API 
  * @return   The JSON response from the request 
  */
-function search($term, $LATITUDE, $LONGITUDE) {
+function search($term, $ll) {
     $url_params = array();
     
     $url_params['term'] = $term ?: $GLOBALS['DEFAULT_TERM'];
@@ -141,18 +141,27 @@ function get_business($business_id) {
  */
 function query_api($term, $location) {     
     $response = json_decode(search($term, $location));
-    $business_id = $response->businesses[0]->id;
+    // $business_id = $response->businesses[0]->id;
+    // $business_id2 = $response->businesses[1] ->id;
     
     print sprintf(
         "%d businesses found, querying business info for the top result \"%s\"\n\n",         
         count($response->businesses),
-        $business_id
+        $GLOBALS['SEARCH_LIMIT']
     );
     
-    $response = get_business($business_id);
+    // $response = get_business($business_id);
+    // $response2 = get_business($business_id2);
     
     print sprintf("Result for business \"%s\" found:\n", $business_id);
-    print "$response\n";
+    for ($times = 0; $times < 10; $times++) {
+        $business_id = $response->businesses[$times]->id;
+        $result = get_business($business_id);
+        $stringed = "\"$result\"";
+        print $stringed;
+    }
+    // print "$response\n";
+    // print "$response2\n";
 }
 
 /**
@@ -166,8 +175,8 @@ $longopts  = array(
     
 $options = getopt("", $longopts);
 
-$term = $options['term'] ?: '';
-$latitude = $options['ll'] ?: '';
+// $term = $options['term'] ?: '';
+// $latitude = $options['ll'] ?: '';
 // $longitude = $options['longitude'] ?: '';
 
 
