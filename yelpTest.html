@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Geolocation</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      html, body {
+        font-family: 'Open Sans';
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 100%;
+        width: 75%;
+        position: fixed;
+        left: 25%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="side-bar">
+      <div id="title"> By the Way </div>
+      <hr />
+      <div id="search">
+        Directions to:
+        <input id="pac-input" class="controls" type="text"
+              placeholder="Enter a location">
+      </div>
+      <hr />
+      <div id="filters">
+        Filters:
+      </div>
+    </div>
+    <div id="map"></div>
+    <script>
+      // Note: This example requires that you consent to location sharing when
+      // prompted by your browser. If you see the error "The Geolocation service
+      // failed.", it means you probably did not give permission for the browser to
+      // locate you.
+
+        // Global variables
+        var userposition;
+        var destination;
+
+        function test() {
+            console.log(obj[1].business_id);
+        }
+
+        function initMap() {
+
+          //Direction objects
+          var directionsService = new google.maps.DirectionsService;
+          var directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true});
+
+          var map = new google.maps.Map(document.getElementById('map'), {
+              center: {lat: 0, lng: 0},
+              zoom: 12
+          });
+
+          // Display directions on map
+          directionsDisplay.setMap(map);
+
+          var infoWindow = new google.maps.InfoWindow({map: map});
+
+          // Try HTML5 geolocation.
+          if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(function(position) {
+                userlat = position.coords.latitude;
+                userlng = position.coords.longitude;
+                var pos = {
+                  lat: userlat,
+                  lng: userlng
+                };
+                userposition = pos;
+
+                var request = {
+                  location: new google.maps.LatLng(userlat, userlng),
+                  radius: '1000',
+                  types: ['restaurant']
+                };
+
+                // Create the PlaceService and send the request.
+                // Handle the callback with an anonymous function.
+                var service = new google.maps.places.PlacesService(map);
+                service.nearbySearch(request, function(results, status) {
+                    if (status == google.maps.places.PlacesServiceStatus.OK) {
+                      for (var i = 0; i < results.length; i++) {
+                        var place = results[i];
+                        console.log(place.name);
+                        // If the request succeeds, draw the place location on
+                        // the map as a marker, and register an event to handle a
+                        // click on the marker.
+                        var marker = new google.maps.Marker({
+                          map: map,
+                          position: place.geometry.location,
+                          title: place.name
+                        });
+                        markerListener(marker, infoWindow);
+                      };
+                    }
+                });
+                infoWindow.setPosition(pos);
+                infoWindow.setContent('Location found.');
+                map.setCenter(pos);
+
+              }, function() {
+                handleLocationError(true, infoWindow, map.getCenter());
+              });
+          } else {
+            // Browser doesn't support Geolocation
+            handleLocationError(false, infoWindow, map.getCenter());
+          }
+          var input = /** @type {!HTMLInputElement} */(document.getElementById('pac-input'));
+
+          var types = document.getElementById('type-selector');
+
+          var autocomplete = new google.maps.places.Autocomplete(input);
+          autocomplete.bindTo('bounds', map);
+
+          var infowindow = new google.maps.InfoWindow();
+          var marker = new google.maps.Marker({
+              map: map,
+              anchorPoint: new google.maps.Point(0, -29)
+          });
+
+          autocomplete.addListener('place_changed', function() {
+              infowindow.close();
+              marker.setVisible(false);
+              var place = autocomplete.getPlace();
+              if (!place.geometry) {
+                window.alert("Autocomplete's returned place contains no geometry");
+                return;
+              }
+
+              // If the place has a geometry, then present it on a map.
+              if (place.geometry.viewport) {
+                map.fitBounds(place.geometry.viewport);
+              } else {
+                map.setCenter(place.geometry.location);
+                map.setZoom(17);  // Why 17? Because it looks good.
+              }
+              marker.setIcon(/** @type {google.maps.Icon} */({
+                url: place.icon,
+                size: new google.maps.Size(71, 71),
+                origin: new google.maps.Point(0, 0),
+                anchor: new google.maps.Point(17, 34),
+                scaledSize: new google.maps.Size(35, 35)
+              }));
+              marker.setPosition(place.geometry.location);
+              marker.setVisible(true);
+
+              var address = '';
+              if (place.address_components) {
+                address = [(place.address_components[0] && place.address_components[0].short_name || ''),(place.address_components[1] && place.address_components[1].short_name || ''),(place.address_components[2] && place.address_components[2].short_name || '')].join(' ');
+              }
+              destination = address;
+              infowindow.setContent('<div><strong>' + place.name + '</strong><br>' + address);
+              infowindow.open(map, marker);
+              calculateAndDisplayRoute(directionsService, directionsDisplay, infoWindow, map);
+          });
+          google.maps.event.addDomListener(window, 'load', initMap);
+        }
+
+        function showSteps(directionResult, infoWindow, map) {
+            var myRoute = directionResult.routes[0].legs[0];
+            for (var i = 0; i < myRoute.steps.length; i++) {
+              var marker2 = new google.maps.Marker ({
+                map: map,
+                position: myRoute.steps[i].start_location
+              });
+
+              var currPos = marker2.position;
+              // console.log(currPos.lat());
+
+                // var currPos = myRoute.steps[i].start_location;
+                var request = {
+                  location: new google.maps.LatLng(currPos.lat(), currPos.lng()),
+                  radius: '1000',
+                  types: ['restaurant']
+                };
+                var service = new google.maps.places.PlacesService(map);
+                service.nearbySearch(request, function(results, status) {
+                    if (status == google.maps.places.PlacesServiceStatus.OK) {
+                      for (var i = 0; i < results.length; i++) {
+                        var place = results[i];
+                        console.log(place.name);
+                        // If the request succeeds, draw the place location on
+                        // the map as a marker, and register an event to handle a
+                        // click on the marker.
+                        var marker = new google.maps.Marker({
+                          map: map,
+                          position: place.geometry.location,
+                          title: place.name
+                        });
+                        markerListener(marker, infoWindow);
+                      };
+                    }
+                });
+            }
+        }
+
+        function markerListener(marker, infoWindow) {
+            google.maps.event.addListener(marker, 'click', function() {
+                infoWindow.setContent(marker.title);
+                infoWindow.open(map, this);
+            });
+        }
+
+        function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+          infoWindow.setPosition(pos);
+          infoWindow.setContent(browserHasGeolocation ?
+                              'Error: The Geolocation service failed.' :
+                              'Error: Your browser doesn\'t support geolocation.');
+        }
+
+        function calculateAndDisplayRoute(directionsService, directionsDisplay, infoWindow, map) {
+          console.log(destination);
+            directionsService.route({
+              origin: this.userposition,
+              destination: this.destination,
+              travelMode: google.maps.TravelMode.DRIVING
+            }, function(response, status) {
+              if (status === google.maps.DirectionsStatus.OK) {
+                directionsDisplay.setDirections(response);
+                showSteps(response, infoWindow, map);
+              } else {
+                window.alert('Directions request failed due to ' + status);
+              }
+            });
+         }
+
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIWmrMuD_FvvSM0D61NVcOtGTTDDtgDzg&libraries=places&callback=initMap">
+    </script>
+  </body>
+</html>
